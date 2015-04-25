@@ -1,0 +1,14 @@
+package org.jruby.ext;
+
+import org.junit.Test;
+
+public class TestOj{
+
+    Oj oj;
+    public TestOj(){
+        oj = new Oj();
+    }
+
+    
+
+}
