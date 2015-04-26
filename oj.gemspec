@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
 
   if RUBY_PLATFORM =~ /java/
     s.platform = "java"
-    files << "lib/oj.jar"
+    files << "bin/oj.jar"
   else
     
   end
