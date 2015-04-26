@@ -3,11 +3,11 @@ package org.jruby.ext;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
-public class TestOj{
+public class TestOjLibrary{
 
-    Oj oj;
-    public TestOj(){
-        oj = new Oj();
+    OjLibrary oj;
+    public TestOjLibrary(){
+        oj = new OjLibrary();
     }
 
     @Test

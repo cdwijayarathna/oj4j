@@ -8,31 +8,31 @@ CLASSES_DIR = "pkg/classes"
 
 task :setup do  
   ant.path :id => 'classpath' do  
-    fileset :dir => "./pkg/jar"
+    fileset :dir => "./bin"
   end  
 end 
 
 desc "Clean up build artifacts"
 task :clean do
   rm_rf "pkg/classes"
-  rm_rf "lib/oj.jar"
+  rm_rf "bin/oj.jar"
 end
 
 desc "Compile the extension"
 task :compile => "pkg/classes" do |t|
   ant.javac :srcdir => "ext", :destdir => t.prerequisites.first,
     :source => "1.5", :target => "1.5", :debug => true,
-    :classpath => "${java.class.path}:${sun.boot.class.path}:./lib/junit-4.12.jar:./lib/oj.jar:./lib/ant-junit4.jar"
+    :classpath => "${java.class.path}:${sun.boot.class.path}:./bin/junit-4.12.jar:./lib/oj.jar:./bin/ant-junit4.jar:./bin/hamcrest-all-1.3.jar"
 end
 
 desc "Build the jar"
 task :jar => :compile do
-  ant.jar :basedir => "pkg/classes", :destfile => "pkg/jar/oj.jar", :includes => "**/*.class"
+  ant.jar :basedir => "pkg/classes", :destfile => "bin/oj.jar", :includes => "**/*.class"
 end
 
 task :run_tests => [:jar,:setup] do  
   ant.mkdir :dir => TEST_REPORT_DIR  
-  ant.junit :fork => "yes", :forkmode => "once", :printsummary => "yes",  
+  ant.junit :fork => "yes", :forkmode => "perTest", :printsummary => "yes",  
             :haltonfailure => "no", :failureproperty => "tests.failed" do  
     classpath :refid => 'classpath'
     formatter :type => "xml"  
