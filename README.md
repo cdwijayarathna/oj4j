@@ -11,3 +11,9 @@ gem build oj.gemspec
 
 gem install oj
 
+## Unit testing
+
+Copy junit.jar and ant-junit4.jar in to lib folder.
+
+rake run_tests
+
