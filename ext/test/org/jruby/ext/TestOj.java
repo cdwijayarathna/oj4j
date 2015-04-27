@@ -86,7 +86,7 @@ public class TestOj{
     }
     
     @Test
-    public void test_saj_parse()) {
+    public void test_saj_parse() {
         
     }
     
