@@ -6,9 +6,10 @@ TEST_SRC_DIR = 'ext/test'
 TEST_REPORT_DIR = "pkg/report"
 CLASSES_DIR = "pkg/classes"
 
-task :setup do  
+task :setup do   
   ant.path :id => 'classpath' do  
     fileset :dir => "./bin"
+    pathelement :location => File.join(RbConfig::CONFIG["libdir"],"jruby.jar")
   end  
 end 
 
