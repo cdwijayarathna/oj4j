@@ -19,11 +19,11 @@ public class StringWriter extends RubyObject {
         System.out.println("constrctr");
     }
     
-    /*@JRubyMethod(name = "new", meta=true,required = 0, optional = 1)
+    @JRubyMethod(name = "new", meta=true,required = 0, optional = 1)
     public static IRubyObject neww(ThreadContext context, IRubyObject self, IRubyObject[] args) {
         System.out.println("String_Writer new");
         return context.nil;
-    }*/
+    }
     
     @JRubyMethod
     public IRubyObject pop(ThreadContext context) {
