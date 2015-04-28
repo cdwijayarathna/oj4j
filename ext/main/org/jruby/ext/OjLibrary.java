@@ -32,6 +32,9 @@ public class OjLibrary implements Library {
         
         RubyClass streamWriterClass = runtime.defineClassUnder("StreamWriter", runtime.getObject(), STREAM_WRITER_ALLOCATOR, ojModule);
         streamWriterClass.defineAnnotatedMethods(StreamWriter.class);
+        
+        RubyClass stringWriterClass = runtime.defineClassUnder("StringWriter", runtime.getObject(), STRING_WRITER_ALLOCATOR, ojModule);
+        stringWriterClass.defineAnnotatedMethods(StringWriter.class);
     }
     
     private static final ObjectAllocator DOC_ALLOCATOR = new ObjectAllocator() {
@@ -43,6 +46,12 @@ public class OjLibrary implements Library {
     private static final ObjectAllocator STREAM_WRITER_ALLOCATOR = new ObjectAllocator() {
         public IRubyObject allocate(Ruby runtime, RubyClass klazz) {
             return new StreamWriter(runtime, klazz);
+        }
+    };
+    
+    private static final ObjectAllocator STRING_WRITER_ALLOCATOR = new ObjectAllocator() {
+        public IRubyObject allocate(Ruby runtime, RubyClass klazz) {
+            return new StringWriter(runtime, klazz);
         }
     };
 
