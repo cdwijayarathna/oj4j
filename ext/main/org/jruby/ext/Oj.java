@@ -112,13 +112,13 @@ public class Oj {
 
     //Parameters not very clear in documentation
     @JRubyMethod(module = true)
-    public static IRubyObject saj_parse(ThreadContext context, IRubyObject self) {
+    public static IRubyObject saj_parse(ThreadContext context, IRubyObject self, IRubyObject handler, IRubyObject io) {
 	System.out.println("Saj Parse");
         return null;
     }
 
     @JRubyMethod(module = true)
-    public static IRubyObject sc_parse(ThreadContext context, IRubyObject self) {
+    public static IRubyObject sc_parse(ThreadContext context, IRubyObject self, IRubyObject handler, IRubyObject io) {
 	System.out.println("Sc Parse");
         return null;
     }
