@@ -22,7 +22,13 @@ import org.jruby.runtime.load.Library;
 import org.jruby.javasupport.JavaEmbedUtils;
 
 public class OjLibrary implements Library {
+	
+	public static Parser parser;
+	
     public void load(Ruby runtime, boolean wrap) throws IOException {
+    	
+    	parser = new Parser();
+    	
         RubyKernel.require(runtime.getKernel(), runtime.newString("oj"), Block.NULL_BLOCK);
         RubyModule ojModule = runtime.getOrCreateModule("Oj");
         ojModule.defineAnnotatedMethods(Oj.class);
@@ -35,6 +41,7 @@ public class OjLibrary implements Library {
         
         RubyClass stringWriterClass = runtime.defineClassUnder("StringWriter", runtime.getObject(), STRING_WRITER_ALLOCATOR, ojModule);
         stringWriterClass.defineAnnotatedMethods(StringWriter.class);
+        
     }
     
     private static final ObjectAllocator DOC_ALLOCATOR = new ObjectAllocator() {

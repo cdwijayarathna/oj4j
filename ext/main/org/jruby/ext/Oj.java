@@ -1,12 +1,13 @@
 package org.jruby.ext;
 
+import org.jruby.RubyHash;
+import org.jruby.RubySymbol;
 import org.jruby.anno.JRubyMethod;
 import org.jruby.anno.JRubyModule;
 import org.jruby.common.RubyWarnings;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
-import org.jruby.*;
 import java.util.concurrent.Callable;
 import org.jruby.javasupport.JavaEmbedUtils;
 
@@ -16,6 +17,8 @@ import static org.jruby.runtime.invokedynamic.MethodNames.OP_CMP;
 
 @JRubyModule(name="Oj")
 public class Oj {
+	
+	
     
     @JRubyMethod(module = true)
     public static IRubyObject compat_load(ThreadContext context, IRubyObject self, IRubyObject json, IRubyObject options) {
@@ -32,8 +35,9 @@ public class Oj {
 
     @JRubyMethod(module = true)
     public static IRubyObject default_options(ThreadContext context, IRubyObject self) {
-	System.out.println("Default Options 1");
-        return null;
+    	RubyHash opts=RubyHash.newHash(context.runtime);
+    	opts.op_aset(context,RubySymbol.newSymbol(context.runtime, "indent"),context.runtime.newFixnum(OjLibrary.parser.getIndent()));
+        return opts;
     }
 
     @JRubyMethod(name = "default_options=",module = true)
