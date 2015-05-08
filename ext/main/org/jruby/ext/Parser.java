@@ -11,9 +11,9 @@ public class Parser{
 	private char mode;				// StrictMode = 's',ObjectMode = 'o', NullMode = 'n', CompatMode = 'c'		
 	private char class_cache;		//Yes = y, No = n
 	private char time_format;		// UnixTime	= 'u', UnixZTime = 'z', XmlTime	= 'x', RubyTime	= 'r'
-	private char bigdec_as_num; 	//Yes = y, No = n
+	private char bigdec_as_num;		//Yes = y, No = n
 	private char bigdec_load;		//BigDec = 'b', FloatDec = 'f', AutoDec	= 'a'
-	private char to_json;           //Yes = y, No = n
+	private char to_json;			//Yes = y, No = n
 	private char nilnil;			//Yes = y, No = n
 	private char allow_gc;			//Yes = y, No = n
 	private char quirks_mode;		//Yes = y, No = n
