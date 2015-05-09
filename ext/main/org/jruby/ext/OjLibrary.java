@@ -74,7 +74,7 @@ public class OjLibrary implements Library {
         public static IRubyObject open(ThreadContext context, IRubyObject self, IRubyObject json, Block block) {
             System.out.println("Doc.Open");
             if (!block.isGiven()) return context.nil;
-            block.yield(context, json);
+            //block.yield(context, json);
             return context.nil;
         }
         
@@ -82,7 +82,7 @@ public class OjLibrary implements Library {
         public static IRubyObject open_file(ThreadContext context, IRubyObject self, IRubyObject filename, Block block) {
             System.out.println("Doc.Open_file");
             if (!block.isGiven()) return context.nil;
-            block.yield(context, true);///pass json from file
+            //block.yield(context, true);///pass json from file
             return context.nil;
         }
         
@@ -110,7 +110,7 @@ public class OjLibrary implements Library {
                 path = args[0].convertToString();
             }
             if (!block.isGiven()) return context.nil;
-            block.yield(context, true);
+            //block.yield(context, true);
             return context.nil;
         }
         
@@ -122,7 +122,7 @@ public class OjLibrary implements Library {
                 path = args[0].convertToString();
             }
             if (!block.isGiven()) return context.nil;
-            block.yield(context, true);
+            //block.yield(context, true);
             return context.nil;
         }
         
@@ -134,7 +134,7 @@ public class OjLibrary implements Library {
                 path = args[0].convertToString();
             }
             if (!block.isGiven()) return context.nil;
-            block.yield(context, true);
+            //block.yield(context, true);
             return context.nil;
         }
         
