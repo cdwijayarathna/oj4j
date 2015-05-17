@@ -1,6 +1,12 @@
 package org.jruby.ext;
 
+import org.jruby.RubyBoolean;
+import org.jruby.RubyBoolean.False;
+import org.jruby.RubyBoolean.True;
+import org.jruby.RubyFixnum;
 import org.jruby.RubyHash;
+import org.jruby.RubyModule;
+import org.jruby.RubyString;
 import org.jruby.RubySymbol;
 import org.jruby.anno.JRubyMethod;
 import org.jruby.anno.JRubyModule;
@@ -8,6 +14,7 @@ import org.jruby.common.RubyWarnings;
 import org.jruby.exceptions.RaiseException;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
+import org.jruby.util.TypeConverter;
 import java.util.concurrent.Callable;
 import org.jruby.javasupport.JavaEmbedUtils;
 
@@ -16,8 +23,8 @@ import static org.jruby.runtime.invokedynamic.MethodNames.OP_CMP;
 
 @JRubyModule(name="Oj")
 public class Oj {
-    
-    @JRubyMethod(module = true)
+	
+	@JRubyMethod(module = true)
     public static IRubyObject compat_load(ThreadContext context, IRubyObject self, IRubyObject json, IRubyObject options) {
 	System.out.println("Compat Load with options");
         return null;
@@ -32,7 +39,7 @@ public class Oj {
     @JRubyMethod(module = true)
     public static IRubyObject default_options(ThreadContext context, IRubyObject self) {
     	RubyHash opts=RubyHash.newHash(context.runtime);
-    	opts.op_aset(context,RubySymbol.newSymbol(context.runtime, "indent"),context.runtime.newFixnum(OjLibrary.parser.getIndent()));
+    	opts.op_aset(context, RubySymbol.newSymbol(context.runtime, "indent"), context.runtime.newFixnum(OjLibrary.parser.getIndent()));
     	opts.op_aset(context,RubySymbol.newSymbol(context.runtime, "second_precision"),context.runtime.newFixnum(OjLibrary.parser.getSec_prec()));
     	opts.op_aset(context,RubySymbol.newSymbol(context.runtime, "circular"),OjLibrary.parser.getCircular()=='y'?context.runtime.newBoolean(true):(OjLibrary.parser.getCircular()=='n'?context.runtime.newBoolean(false):context.nil));
     	opts.op_aset(context,RubySymbol.newSymbol(context.runtime, "class_cache"),OjLibrary.parser.getClass_cache()=='y'?context.runtime.newBoolean(true):(OjLibrary.parser.getClass_cache()=='n'?context.runtime.newBoolean(false):context.nil));
@@ -113,8 +120,216 @@ public class Oj {
 
     @JRubyMethod(name = "default_options=",module = true)
     public static IRubyObject default_options(ThreadContext context, IRubyObject self, IRubyObject opts) {
-	System.out.println("Default Options 2");
-        return null;
+    	
+    	TypeConverter.checkType(context, opts, context.runtime.getHash());
+    	RubyHash optHash = (RubyHash)opts;
+    	
+    	IRubyObject val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "indent"));
+    	if (!val.equals(context.nil)){
+    		TypeConverter.checkType(context, val, context.runtime.getFixnum());
+    		int indent = ((RubyFixnum)val).getIntValue();
+    		OjLibrary.parser.setIndent(indent);
+    	}
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "float_precision"));
+    	if (!val.equals(context.nil)){
+    		TypeConverter.checkType(context, val, context.runtime.getFixnum());
+    		int floatPrecision = ((RubyFixnum)val).getIntValue();
+    		if (floatPrecision < 0){
+    			floatPrecision = 0;
+    			OjLibrary.parser.setFloat_fmt("\0");
+    		}else {
+    			if (floatPrecision > 20){
+    				floatPrecision = 20;    				
+    			}
+    			OjLibrary.parser.setFloat_fmt("%%0." + floatPrecision + "g");
+    		}
+    		OjLibrary.parser.setFloat_prec(floatPrecision);
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "second_precision"));
+    	if (!val.equals(context.nil)){
+    		TypeConverter.checkType(context, val, context.runtime.getFixnum());
+    		int secondPrecision = ((RubyFixnum)val).getIntValue();
+    		if (secondPrecision < 0){
+    			secondPrecision = 0;
+    		}else if (secondPrecision > 9){
+    			secondPrecision = 9;
+    		}
+    		OjLibrary.parser.setSec_prec(secondPrecision);
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "mode"));
+    	if (val.equals(context.nil)){
+    		//ignore
+    	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "object"))){
+    		OjLibrary.parser.setMode('o');
+    	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "strict"))){
+    		OjLibrary.parser.setMode('s');
+    	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "compat"))){
+    		OjLibrary.parser.setMode('c');
+    	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "null"))){
+    		OjLibrary.parser.setMode('n');
+    	}else{
+    		throw context.runtime.newArgumentError(":mode must be :object, :strict, :compat, or :null.");
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "time_format"));
+    	if (val.equals(context.nil)){
+    		//ignore
+    	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "unix"))){
+    		OjLibrary.parser.setTime_format('u');
+    	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "unix_zone"))){
+    		OjLibrary.parser.setTime_format('z');
+    	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "xml_schema"))){
+    		OjLibrary.parser.setTime_format('x');
+    	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "ruby"))){
+    		OjLibrary.parser.setTime_format('r');
+    	}else {
+    		throw context.runtime.newArgumentError(":time_format must be :unix, :unix_zone, :xmlschema, or :ruby.");
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "escape_mode"));
+    	if (val.equals(context.nil)){
+    		//ignore
+    	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "newline"))){
+    		OjLibrary.parser.setEscape_mode('n');
+    	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "json"))){
+    		OjLibrary.parser.setEscape_mode('j');
+    	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "xss_safe"))){
+    		OjLibrary.parser.setEscape_mode('x');
+    	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "ascii"))){
+    		OjLibrary.parser.setEscape_mode('a');
+    	}else {
+    		throw context.runtime.newArgumentError(":escape_mode must be :newline, :json, :xss_safe, or :ascii.");
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "bigdecimal_load"));
+    	if (val.equals(context.nil)) {
+    		//ignore
+    	} else if (val.equals(RubySymbol.newSymbol(context.runtime, "bigdecimal")) || val.equals(context.runtime.newBoolean(true))){
+    		OjLibrary.parser.setBigdec_load('b');
+    	} else if (val.equals(RubySymbol.newSymbol(context.runtime, "float"))) {
+    		OjLibrary.parser.setBigdec_load('f');
+    	} else if (val.equals(RubySymbol.newSymbol(context.runtime, "auto")) || val.equals(context.runtime.newBoolean(false))) {
+    		OjLibrary.parser.setBigdec_load('a');
+    	} else {
+    		throw context.runtime.newArgumentError(":bigdecimal_load must be :bigdecimal, :float, or :auto.");
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "create_id"));
+    	if (!val.equals(context.nil)){
+    		OjLibrary.parser.setCreate_id(((RubyString)val).decodeString());
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "circular"));
+    	if (!val.equals(context.nil)) {
+    		if (val instanceof True ){
+    			OjLibrary.parser.setCircular('y');
+    		} else if(val instanceof False ){
+    			OjLibrary.parser.setCircular('n');
+    		} else {
+    			throw context.runtime.newArgumentError(":circular must be true, false, or nil.");
+    		}    		
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "auto_define"));
+    	if (!val.equals(context.nil)) {
+    		if (val instanceof True ){
+    			OjLibrary.parser.setAuto_define('y');
+    		} else if(val instanceof False ){
+    			OjLibrary.parser.setAuto_define('n');
+    		} else {
+    			throw context.runtime.newArgumentError(":auto_define must be true, false, or nil.");
+    		}    		
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "symbol_keys"));
+    	if (!val.equals(context.nil)) {
+    		if (val instanceof True ){
+    			OjLibrary.parser.setSym_key('y');
+    		} else if(val instanceof False ){
+    			OjLibrary.parser.setSym_key('n');
+    		} else {
+    			throw context.runtime.newArgumentError(":symbol_keys must be true, false, or nil.");
+    		}    		
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "class_cache"));
+    	if (!val.equals(context.nil)) {
+    		if (val instanceof True ){
+    			OjLibrary.parser.setClass_cache('y');
+    		} else if(val instanceof False ){
+    			OjLibrary.parser.setClass_cache('n');
+    		} else {
+    			throw context.runtime.newArgumentError(":class_cache must be true, false, or nil.");
+    		}    		
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "bigdecimal_as_decimal"));
+    	if (!val.equals(context.nil)) {
+    		if (val instanceof True ){
+    			OjLibrary.parser.setBigdec_as_num('y');
+    		} else if(val instanceof False ){
+    			OjLibrary.parser.setBigdec_as_num('n');
+    		} else {
+    			throw context.runtime.newArgumentError(":bigdecimal_as_decimal must be true, false, or nil.");
+    		}    		
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "use_to_json"));
+    	if (!val.equals(context.nil)) {
+    		if (val instanceof True ){
+    			OjLibrary.parser.setTo_json('y');
+    		} else if(val instanceof False ){
+    			OjLibrary.parser.setTo_json('n');
+    		} else {
+    			throw context.runtime.newArgumentError(":use_to_json must be true, false, or nil.");
+    		}    		
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "nilnil"));
+    	if (!val.equals(context.nil)) {
+    		if (val instanceof True ){
+    			OjLibrary.parser.setNilnil('y');
+    		} else if(val instanceof False ){
+    			OjLibrary.parser.setNilnil('n');
+    		} else {
+    			throw context.runtime.newArgumentError(":nilnil must be true, false, or nil.");
+    		}    		
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "allow_gc"));
+    	if (!val.equals(context.nil)) {
+    		if (val instanceof True ){
+    			OjLibrary.parser.setAllow_gc('y');
+    		} else if(val instanceof False ){
+    			OjLibrary.parser.setAllow_gc('n');
+    		} else {
+    			throw context.runtime.newArgumentError(":allow_gc must be true, false, or nil.");
+    		}    		
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "quirks_mode"));
+    	if (!val.equals(context.nil)) {
+    		if (val instanceof True ){
+    			OjLibrary.parser.setQuirks_mode('y');
+    		} else if(val instanceof False ){
+    			OjLibrary.parser.setQuirks_mode('n');
+    		} else {
+    			throw context.runtime.newArgumentError(":quirks_mode must be true, false, or nil.");
+    		}    		
+    	}
+    	
+    	val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "ascii_only"));
+    	if (!val.equals(context.nil)) {
+    		if (val instanceof True ){
+    			OjLibrary.parser.setEscape_mode('a');
+    		} else if(val instanceof False ){
+    			OjLibrary.parser.setEscape_mode('j');
+    		}    		
+    	}
+    	
+        return context.nil;
     }
 
     @JRubyMethod(module = true)
