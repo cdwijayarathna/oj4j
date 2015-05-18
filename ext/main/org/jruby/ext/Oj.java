@@ -24,13 +24,7 @@ import static org.jruby.runtime.invokedynamic.MethodNames.OP_CMP;
 @JRubyModule(name="Oj")
 public class Oj {
 	
-	@JRubyMethod(module = true, required = 1, optional = 1)
-    public static IRubyObject compat_load(ThreadContext context, IRubyObject self, IRubyObject[] args) {
-	System.out.println("Compat Load with options");
-        return null;
-    }
-    
-    @JRubyMethod(module = true)
+	@JRubyMethod(module = true)
     public static IRubyObject default_options(ThreadContext context, IRubyObject self) {
     	RubyHash opts=RubyHash.newHash(context.runtime);
     	opts.op_aset(context, RubySymbol.newSymbol(context.runtime, "indent"), context.runtime.newFixnum(OjLibrary.parser.getIndent()));
@@ -325,16 +319,51 @@ public class Oj {
     	
         return context.nil;
     }
+    
+    @JRubyMethod(module = true, required = 1, optional = 1)
+    public static IRubyObject load(ThreadContext context, IRubyObject self, IRubyObject[] args) {
+    	
+    	char mode = OjLibrary.parser.getMode();
+    	
+    	if(args.length<=0){
+    		throw context.runtime.newArgumentError("Wrong number of arguments to load().");
+    	}else if(args.length >= 2){
+    		TypeConverter.checkType(context, args[1], context.runtime.getHash());
+        	RubyHash optHash = (RubyHash)args[1];
+        	
+        	IRubyObject val = optHash.op_aref(context,RubySymbol.newSymbol(context.runtime, "mode"));
+        	if (val.equals(context.nil)){
+        		//ignore
+        	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "object"))){
+        		mode = 'o';
+        	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "strict"))){
+        		mode = 's';
+        	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "compat"))){
+        		mode = 'c';
+        	}else if (val.equals(RubySymbol.newSymbol(context.runtime, "null"))){
+        		mode = 'n';
+        	}else{
+        		throw context.runtime.newArgumentError(":mode must be :object, :strict, :compat, or :null.");
+        	}
+    	}
+    	
+    	switch (mode){
+			case 's':	
+				return strict_load(context, self, args);
+			case 'n':
+			case 'c':	
+				return compat_load(context, self, args);
+			case 'o':
+			default:
+				break;
+    	}
+    	
+        return object_load(context, self, args);
+    }
 
     @JRubyMethod(module = true, required = 1, optional = 1)
     public static IRubyObject dump(ThreadContext context, IRubyObject self, IRubyObject[] args) {
 	System.out.println("Dump with options");
-        return null;
-    }
-
-    @JRubyMethod(module = true, required = 1, optional = 1)
-    public static IRubyObject load(ThreadContext context, IRubyObject self, IRubyObject[] args) {
-	System.out.println("Load with options");
         return null;
     }
 
@@ -400,5 +429,12 @@ public class Oj {
 	System.out.println("To stream with options");
         return null;
     }
+    
+    @JRubyMethod(module = true, required = 1, optional = 1)
+    public static IRubyObject compat_load(ThreadContext context, IRubyObject self, IRubyObject[] args) {
+	System.out.println("Compat Load with options");
+        return null;
+    }
+    
     
 }
