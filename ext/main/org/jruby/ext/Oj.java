@@ -24,15 +24,9 @@ import static org.jruby.runtime.invokedynamic.MethodNames.OP_CMP;
 @JRubyModule(name="Oj")
 public class Oj {
 	
-	@JRubyMethod(module = true)
-    public static IRubyObject compat_load(ThreadContext context, IRubyObject self, IRubyObject json, IRubyObject options) {
+	@JRubyMethod(module = true, required = 1, optional = 1)
+    public static IRubyObject compat_load(ThreadContext context, IRubyObject self, IRubyObject[] args) {
 	System.out.println("Compat Load with options");
-        return null;
-    }
-    
-    @JRubyMethod(module = true)
-    public static IRubyObject compat_load(ThreadContext context, IRubyObject self, IRubyObject json) {
-	System.out.println("Compat Load without options");
         return null;
     }
     
@@ -332,39 +326,21 @@ public class Oj {
         return context.nil;
     }
 
-    @JRubyMethod(module = true)
-    public static IRubyObject dump(ThreadContext context, IRubyObject self, IRubyObject obj, IRubyObject options) {
+    @JRubyMethod(module = true, required = 1, optional = 1)
+    public static IRubyObject dump(ThreadContext context, IRubyObject self, IRubyObject[] args) {
 	System.out.println("Dump with options");
         return null;
     }
-   
-    @JRubyMethod(module = true)
-    public static IRubyObject dump(ThreadContext context, IRubyObject self, IRubyObject obj) {
-	System.out.println("Dump without options");
-        return null;
-    }
 
-    @JRubyMethod(module = true)
-    public static IRubyObject load(ThreadContext context, IRubyObject self, IRubyObject json, IRubyObject options) {
+    @JRubyMethod(module = true, required = 1, optional = 1)
+    public static IRubyObject load(ThreadContext context, IRubyObject self, IRubyObject[] args) {
 	System.out.println("Load with options");
         return null;
     }
-    
-    @JRubyMethod(module = true)
-    public static IRubyObject load(ThreadContext context, IRubyObject self, IRubyObject json) {
-	System.out.println("Load without options");
-        return null;
-    }
 
-    @JRubyMethod(module = true)
-    public static IRubyObject load_file(ThreadContext context, IRubyObject self, IRubyObject path, IRubyObject options) {
+    @JRubyMethod(module = true, required = 1, optional = 1)
+    public static IRubyObject load_file(ThreadContext context, IRubyObject self, IRubyObject[] args) {
 	System.out.println("Load File with options");
-        return null;
-    }
-    
-    @JRubyMethod(module = true)
-    public static IRubyObject load_file(ThreadContext context, IRubyObject self, IRubyObject path) {
-	System.out.println("Load File without options");
         return null;
     }
 
@@ -374,15 +350,9 @@ public class Oj {
         return null;
     }
 
-    @JRubyMethod(module = true)
-    public static IRubyObject object_load(ThreadContext context, IRubyObject self, IRubyObject json, IRubyObject options) {
+    @JRubyMethod(module = true, required = 1, optional = 1)
+    public static IRubyObject object_load(ThreadContext context, IRubyObject self, IRubyObject[] args) {
 	System.out.println("Object Load with options");
-        return null;
-    }
-    
-    @JRubyMethod(module = true)
-    public static IRubyObject object_load(ThreadContext context, IRubyObject self, IRubyObject json) {
-	System.out.println("Object Load without options");
         return null;
     }
 
@@ -413,42 +383,22 @@ public class Oj {
         return null;
     }
 
-    @JRubyMethod(module = true)
-    public static IRubyObject strict_load(ThreadContext context, IRubyObject self, IRubyObject json, IRubyObject options) {
+    @JRubyMethod(module = true, required = 1, optional = 1)
+    public static IRubyObject strict_load(ThreadContext context, IRubyObject self, IRubyObject[] args) {
 	System.out.println("Strict Load with options");
         return null;
     }
-    
-    @JRubyMethod(module = true)
-    public static IRubyObject strict_load(ThreadContext context, IRubyObject self, IRubyObject json) {
-	System.out.println("Strict Load without options");
-        return null;
-    }
 
-   @JRubyMethod(module = true)
-    public static IRubyObject to_file(ThreadContext context, IRubyObject self, IRubyObject file_path, IRubyObject obj, IRubyObject options) {
+    @JRubyMethod(module = true, required = 2, optional = 1)
+    public static IRubyObject to_file(ThreadContext context, IRubyObject self, IRubyObject[] args) {
 	System.out.println("To File with options");
         return null;
     }
-    
 
-    @JRubyMethod(module = true)
-    public static IRubyObject to_file(ThreadContext context, IRubyObject self, IRubyObject file_path, IRubyObject obj) {
-	System.out.println("To File without options");
-        return null;
-    }
-
-    @JRubyMethod(module = true)
-    public static IRubyObject to_stream(ThreadContext context, IRubyObject self, IRubyObject io, IRubyObject obj, IRubyObject options) {
+    @JRubyMethod(module = true, required = 2, optional = 1)
+    public static IRubyObject to_stream(ThreadContext context, IRubyObject self, IRubyObject[] args) {
 	System.out.println("To stream with options");
         return null;
     }
     
-    @JRubyMethod(module = true)
-    public static IRubyObject to_stream(ThreadContext context, IRubyObject self, IRubyObject io, IRubyObject obj) {
-	System.out.println("To stream without options");
-        return null;
-    }
-
-
 }
