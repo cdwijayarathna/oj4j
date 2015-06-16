@@ -1,6 +1,6 @@
-package org.jruby.ext;
+package org.jruby.ext.beans;
 
-public class Parser{
+public class Options {
 	
 	//options
 	private int indent;
@@ -23,7 +23,7 @@ public class Parser{
 	private int float_prec;
 	private String float_fmt;
 	
-	public Parser(){
+	public Options(){
 		
 		this.indent = 0;
 		this.circular = 'n';

@@ -22,7 +22,7 @@ end
 desc "Compile the extension"
 task :compile => "pkg/classes" do |t|
   ant.javac :srcdir => "ext", :destdir => t.prerequisites.first,
-    :source => "1.5", :target => "1.5", :debug => true,
+    :source => "1.7", :target => "1.7", :debug => true,
     :classpath => "${java.class.path}:${sun.boot.class.path}:./bin/junit-4.12.jar:./lib/oj.jar:./bin/ant-junit4.jar:./bin/hamcrest-all-1.3.jar"
 end
 
