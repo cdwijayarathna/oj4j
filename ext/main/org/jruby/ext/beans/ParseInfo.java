@@ -1,6 +1,7 @@
 package org.jruby.ext.beans;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 public abstract class ParseInfo {
 
@@ -11,8 +12,7 @@ public abstract class ParseInfo {
     private Options options;
     private Object handler;
     private int expectValue;
-
-    private ArrayList<Val> stack;
+    private Stack<Val> stack;
 
     public String getCur() {
         return cur;
@@ -70,11 +70,11 @@ public abstract class ParseInfo {
         this.expectValue = expectValue;
     }
 
-    public ArrayList<Val> getStack() {
+    public Stack<Val> getStack() {
         return stack;
     }
 
-    public void setStack(ArrayList<Val> stack) {
+    public void setStack(Stack<Val> stack) {
         this.stack = stack;
     }
 
@@ -90,7 +90,7 @@ public abstract class ParseInfo {
 
     abstract public void hashSetvalue(ParseInfo pi, Val kval, Object value);
 
-    abstract public Object startArray(ParseInfo pi);
+    abstract public ArrayList startArray(ParseInfo pi);
 
     abstract public void endArray(ParseInfo pi);
 

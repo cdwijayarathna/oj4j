@@ -1,5 +1,7 @@
 package org.jruby.ext.beans;
 
+import java.util.Hashtable;
+
 /**
  * Created by chamila on 6/6/15.
  */
@@ -11,5 +13,35 @@ public class Val {
     private Object keyVal;
 
 
+    public Object getVal() {
+        return val;
+    }
 
+    public void setVal(Object val) {
+        this.val = val;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getKeyArray() {
+        return keyArray;
+    }
+
+    public void setKeyArray(String keyArray) {
+        this.keyArray = keyArray;
+    }
+
+    public Object getKeyVal() {
+        return keyVal;
+    }
+
+    public void setKeyVal(Object keyVal) {
+        this.keyVal = keyVal;
+    }
 }
