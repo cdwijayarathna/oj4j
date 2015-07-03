@@ -12,6 +12,9 @@ import org.jruby.anno.JRubyMethod;
 import org.jruby.anno.JRubyModule;
 import org.jruby.common.RubyWarnings;
 import org.jruby.exceptions.RaiseException;
+import org.jruby.ext.beans.Options;
+import org.jruby.ext.beans.ParseInfo;
+import org.jruby.ext.beans.StrictparserInfo;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.util.TypeConverter;
@@ -414,8 +417,11 @@ public class Oj {
 
     @JRubyMethod(module = true, required = 1, optional = 1)
     public static IRubyObject strict_load(ThreadContext context, IRubyObject self, IRubyObject[] args) {
-	System.out.println("Strict Load with options");
-        return null;
+
+		StrictparserInfo pi = new StrictparserInfo();
+		pi.setOptions(new Options());
+		ojParsePi(context, args, pi,  null,1);
+		return null;
     }
 
     @JRubyMethod(module = true, required = 2, optional = 1)
@@ -435,6 +441,32 @@ public class Oj {
 	System.out.println("Compat Load with options");
         return null;
     }
+
+	private static Object ojParsePi(ThreadContext context, IRubyObject[] args, ParseInfo pi, String json, int yield0k){
+
+
+		if(args.length < 1){
+			throw context.runtime.newArgumentError("Wrong number of arguments to load().");
+		}
+		Object input = args[0];
+		if(args.length == 2){
+			//Need to test if correct
+			default_options(context, null,args[1]);
+		}
+		pi.setProc(null);
+		if(json != null) {
+			pi.setJson(json);
+		}else if(input instanceof String){
+
+		}
+
+		return null;
+	}
+
+	private static void oj_pi_set_input_str(ParseInfo pi, Object input){
+
+
+	}
     
     
 }

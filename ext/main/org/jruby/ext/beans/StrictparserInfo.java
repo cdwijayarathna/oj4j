@@ -103,6 +103,14 @@ public class StrictparserInfo extends ParseInfo {
         //not implemented
     }
 
+    public Object getProc() {
+        return super.getProc();
+    }
+
+    public void setProc(Object proc) {
+        super.setProc(proc);
+    }
+
     @Override
     public Object hashKey(ParseInfo pi, String key, int klen) {
         return null;
@@ -165,5 +173,5 @@ public class StrictparserInfo extends ParseInfo {
     public void addValue(ParseInfo pi, Object value) {
         pi.getStack().get(0).setVal(value);
     }
-    
+
 }

@@ -13,6 +13,7 @@ public abstract class ParseInfo {
     private Object handler;
     private int expectValue;
     private Stack<Val> stack;
+    private Object proc;
 
     public String getCur() {
         return cur;
@@ -76,6 +77,15 @@ public abstract class ParseInfo {
 
     public void setStack(Stack<Val> stack) {
         this.stack = stack;
+    }
+
+
+    public Object getProc() {
+        return proc;
+    }
+
+    public void setProc(Object proc) {
+        this.proc = proc;
     }
 
     abstract public Object startHash(ParseInfo pi);
