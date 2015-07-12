@@ -14,6 +14,15 @@ public abstract class ParseInfo {
     private int expectValue;
     private Stack<Val> stack;
     private Object proc;
+    private CircArray circArray;
+
+    public CircArray getCircArray() {
+        return circArray;
+    }
+
+    public void setCircArray(CircArray circArray) {
+        this.circArray = circArray;
+    }
 
     public String getCur() {
         return cur;
@@ -88,32 +97,32 @@ public abstract class ParseInfo {
         this.proc = proc;
     }
 
-    abstract public Object startHash(ParseInfo pi);
+    abstract public Object startHash();
 
-    abstract public void endHash(ParseInfo pi);
+    abstract public void endHash();
 
-    abstract public Object hashKey(ParseInfo pi, String key, int klen);
+    abstract public Object hashKey(String key, int klen);
 
-    abstract public void hashSetCstr(ParseInfo pi, Val kval, String str, int len, String orig);
+    abstract public void hashSetCstr(Val kval, String str, int len, String orig);
 
-    abstract public void hashSetNum(ParseInfo pi, Val kval, NumInfo ni);
+    abstract public void hashSetNum(Val kval, NumInfo ni);
 
-    abstract public void hashSetvalue(ParseInfo pi, Val kval, Object value);
+    abstract public void hashSetvalue(Val kval, Object value);
 
-    abstract public ArrayList startArray(ParseInfo pi);
+    abstract public ArrayList startArray();
 
-    abstract public void endArray(ParseInfo pi);
+    abstract public void endArray();
 
-    abstract public void arrayAppendCstr(ParseInfo pi, String str, int len, String orig);
+    abstract public void arrayAppendCstr(String str, int len, String orig);
 
-    abstract public void arrayAppendNum(ParseInfo pi, NumInfo ni);
+    abstract public void arrayAppendNum(NumInfo ni);
 
-    abstract public void arrayAppendValue(ParseInfo pi, Object value);
+    abstract public void arrayAppendValue(Object value);
 
-    abstract public void addCstr(ParseInfo pi, String str, int len, String orig);
+    abstract public void addCstr(String str, int len, String orig);
 
-    abstract public void addNum(ParseInfo pi, NumInfo ni);
+    abstract public void addNum(NumInfo ni);
 
-    abstract public void addValue(ParseInfo pi, Object value);
+    abstract public void addValue(Object value);
 
 }

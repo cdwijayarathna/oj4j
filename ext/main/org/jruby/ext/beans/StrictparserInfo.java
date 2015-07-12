@@ -14,6 +14,14 @@ public class StrictparserInfo extends ParseInfo {
         this.setExpectValue(1);
     }
 
+    public CircArray getCircArray() {
+        return super.getCircArray();
+    }
+
+    public void setCircArray(CircArray circArray) {
+        super.setCircArray(circArray);
+    }
+
     @Override
     public String getCur() {
         return super.getCur();
@@ -94,12 +102,12 @@ public class StrictparserInfo extends ParseInfo {
     }
 
     @Override
-    public Object startHash(ParseInfo pi) {
+    public Object startHash() {
         return new Hashtable<>();
     }
 
     @Override
-    public void endHash(ParseInfo pi) {
+    public void endHash() {
         //not implemented
     }
 
@@ -112,66 +120,66 @@ public class StrictparserInfo extends ParseInfo {
     }
 
     @Override
-    public Object hashKey(ParseInfo pi, String key, int klen) {
+    public Object hashKey(String key, int klen) {
         return null;
     }
 
     @Override
-    public void hashSetCstr(ParseInfo pi, Val parent, String str, int len, String orig) {
-        ((Hashtable)pi.getStack().peek().getVal()).put(parent.getKeyVal(), str);
+    public void hashSetCstr(Val parent, String str, int len, String orig) {
+        ((Hashtable)this.getStack().peek().getVal()).put(parent.getKeyVal(), str);
     }
 
     @Override
-    public void hashSetNum(ParseInfo pi, Val parent, NumInfo ni) {
+    public void hashSetNum(Val parent, NumInfo ni) {
 
-        ((Hashtable)pi.getStack().peek().getVal()).put(parent.getKeyVal(), ni.getNum());
+        ((Hashtable)this.getStack().peek().getVal()).put(parent.getKeyVal(), ni.getNum());
     }
 
     @Override
-    public void hashSetvalue(ParseInfo pi, Val parent, Object value) {
+    public void hashSetvalue(Val parent, Object value) {
 
-        ((Hashtable)pi.getStack().peek().getVal()).put(parent.getKeyVal(), value);
+        ((Hashtable)this.getStack().peek().getVal()).put(parent.getKeyVal(), value);
 
     }
 
     @Override
-    public ArrayList startArray(ParseInfo pi) {
+    public ArrayList startArray() {
         return new ArrayList();
     }
 
     @Override
-    public void endArray(ParseInfo pi) {
+    public void endArray() {
         //not implemented
     }
 
     @Override
-    public void arrayAppendCstr(ParseInfo pi, String str, int len, String orig) {
-        ((ArrayList)pi.getStack().peek().getVal()).add(str);
+    public void arrayAppendCstr(String str, int len, String orig) {
+        ((ArrayList)this.getStack().peek().getVal()).add(str);
     }
 
     @Override
-    public void arrayAppendNum(ParseInfo pi, NumInfo ni) {
-        ((ArrayList)pi.getStack().peek().getVal()).add(ni.getNum());
+    public void arrayAppendNum(NumInfo ni) {
+        ((ArrayList)this.getStack().peek().getVal()).add(ni.getNum());
     }
 
     @Override
-    public void arrayAppendValue(ParseInfo pi, Object value) {
-        ((ArrayList)pi.getStack().peek().getVal()).add(value);
+    public void arrayAppendValue(Object value) {
+        ((ArrayList)this.getStack().peek().getVal()).add(value);
     }
 
     @Override
-    public void addCstr(ParseInfo pi, String str, int len, String orig) {
-        pi.getStack().get(0).setVal(str);
+    public void addCstr(String str, int len, String orig) {
+        this.getStack().get(0).setVal(str);
     }
 
     @Override
-    public void addNum(ParseInfo pi, NumInfo ni) {
-        pi.getStack().get(0).setVal(ni.getNum());
+    public void addNum(NumInfo ni) {
+        this.getStack().get(0).setVal(ni.getNum());
     }
 
     @Override
-    public void addValue(ParseInfo pi, Object value) {
-        pi.getStack().get(0).setVal(value);
+    public void addValue(Object value) {
+        this.getStack().get(0).setVal(value);
     }
 
 }

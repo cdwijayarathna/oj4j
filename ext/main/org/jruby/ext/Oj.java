@@ -12,9 +12,7 @@ import org.jruby.anno.JRubyMethod;
 import org.jruby.anno.JRubyModule;
 import org.jruby.common.RubyWarnings;
 import org.jruby.exceptions.RaiseException;
-import org.jruby.ext.beans.Options;
-import org.jruby.ext.beans.ParseInfo;
-import org.jruby.ext.beans.StrictparserInfo;
+import org.jruby.ext.beans.*;
 import org.jruby.runtime.ThreadContext;
 import org.jruby.runtime.builtin.IRubyObject;
 import org.jruby.util.TypeConverter;
@@ -445,7 +443,8 @@ public class Oj {
 	private static Object ojParsePi(ThreadContext context, IRubyObject[] args, ParseInfo pi, String json, int yield0k){
 
 
-		if(args.length < 1){
+		Object wrappedStack;
+        if(args.length < 1){
 			throw context.runtime.newArgumentError("Wrong number of arguments to load().");
 		}
 		Object input = args[0];
@@ -457,6 +456,22 @@ public class Oj {
 		if(json != null) {
 			pi.setJson(json);
 		}else if(input instanceof String){
+			pi.setJson((String)input);
+		}else if(input == null && pi.getOptions().getNilnil() == 'y'){
+			return null;
+		}else{
+			//if()
+		}
+
+		if(pi.getOptions().getCircular() == 'y'){
+			pi.setCircArray(new CircArray());
+		}
+		if(pi.getOptions().getAllow_gc() == 'y'){
+
+		}
+        wrappedStack =
+		Val v = pi.getStack().peek();
+		if(v != null){
 
 		}
 
