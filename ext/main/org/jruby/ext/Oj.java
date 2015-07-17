@@ -416,9 +416,9 @@ public class Oj {
     @JRubyMethod(module = true, required = 1, optional = 1)
     public static IRubyObject strict_load(ThreadContext context, IRubyObject self, IRubyObject[] args) {
 
-		StrictparserInfo pi = new StrictparserInfo();
+		ParseInfo pi = new StrictparserInfo();
 		pi.setOptions(new Options());
-		ojParsePi(context, args, pi,  null,1);
+		ojParsePi(context, args, pi, null, 1);
 		return null;
     }
 
@@ -444,34 +444,34 @@ public class Oj {
 
 
 		Object wrappedStack;
-        if(args.length < 1){
+		if (args.length < 1) {
 			throw context.runtime.newArgumentError("Wrong number of arguments to load().");
 		}
 		Object input = args[0];
-		if(args.length == 2){
+		if (args.length == 2) {
 			//Need to test if correct
-			default_options(context, null,args[1]);
+			default_options(context, null, args[1]);
 		}
 		pi.setProc(null);
-		if(json != null) {
+		if (json != null) {
 			pi.setJson(json);
-		}else if(input instanceof String){
-			pi.setJson((String)input);
-		}else if(input == null && pi.getOptions().getNilnil() == 'y'){
+		} else if (input instanceof org.jruby.RubyString) {
+			pi.setJson(((RubyString) input).asJavaString());
+		} else if (input == null && pi.getOptions().getNilnil() == 'y') {
 			return null;
-		}else{
+		} else {
 			//if()
 		}
 
-		if(pi.getOptions().getCircular() == 'y'){
+		if (pi.getOptions().getCircular() == 'y') {
 			pi.setCircArray(new CircArray());
 		}
-		if(pi.getOptions().getAllow_gc() == 'y'){
+		if (pi.getOptions().getAllow_gc() == 'y') {
 
 		}
-        wrappedStack =
+		wrappedStack = pi.getStack();
 		Val v = pi.getStack().peek();
-		if(v != null){
+		if (v != null) {
 
 		}
 

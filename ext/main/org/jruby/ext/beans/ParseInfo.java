@@ -16,6 +16,11 @@ public abstract class ParseInfo {
     private Object proc;
     private CircArray circArray;
 
+    public ParseInfo() {
+        this.json = "";
+        this.stack = new Stack<>();
+    }
+
     public CircArray getCircArray() {
         return circArray;
     }
