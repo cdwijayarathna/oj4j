@@ -11,6 +11,7 @@ public class Val {
     private String key;
     private String keyArray;
     private Object keyVal;
+    private String className;
 
 
     public Object getVal() {
@@ -43,5 +44,13 @@ public class Val {
 
     public void setKeyVal(Object keyVal) {
         this.keyVal = keyVal;
+    }
+
+    public String getClassName(){
+        return className;
+    }
+
+    public void setClassName(String className){
+        this.className = className;
     }
 }
