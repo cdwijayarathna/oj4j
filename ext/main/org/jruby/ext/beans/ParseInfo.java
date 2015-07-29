@@ -102,6 +102,15 @@ public abstract class ParseInfo {
         this.proc = proc;
     }
 
+    public void colon() throws Exception{
+        Val parent = this.getStack().peek();
+        if(parent!=null && parent.getNext() == ':'){
+            parent.setNext('v');
+        } else{
+            throw new Exception("Unexpected Colon");
+        }
+    }
+
     abstract public Object startHash();
 
     abstract public void endHash();
