@@ -11,11 +11,11 @@ public class Parse {
     }
 
     public static void ojParse2(ParseInfo pi) throws Exception {
-        pi.setCur(pi.getCur());
+        //pi.setCur(pi.getCur());
         int currentIndex = 0;
         while(true){
-            currentIndex = nextNonWhite(pi,currentIndex);
-            switch (pi.getCur().charAt(currentIndex)){
+            nextNonWhite(pi);
+            switch (pi.getCurrentChar()){
                 case '{':
                     pi.startHash();
                     break;
@@ -25,22 +25,37 @@ public class Parse {
                 case ':':
                     pi.colon();
                     break;
+                case '[':
+                    pi.startArray();
+                    break;
+                case ']':
+                    pi.endArray();
+                    break;
+                case ',':
+                    pi.comma();
+                    break;
+                case '"':
+
+
+
 
             }
+            pi.incrementCurrentIndex();
         }
 
     }
 
-    public static int nextNonWhite(ParseInfo pi, int currentIndex){
-        for (;true;currentIndex++){
-            switch (pi.getCur().charAt(currentIndex)){
+    public static void nextNonWhite(ParseInfo pi){
+        for (;true;){
+            switch (pi.getCurrentChar()){
                 case '\t':
                 case '\f':
                 case '\n':
                 case '\r':
+                    pi.incrementCurrentIndex();
                     break;
                 default:
-                    return currentIndex;
+                    return;
             }
         }
     }

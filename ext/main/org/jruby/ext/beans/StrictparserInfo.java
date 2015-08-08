@@ -168,7 +168,7 @@ public class StrictparserInfo extends ParseInfo {
     }
 
     @Override
-    public void addCstr(String str, int len, String orig) {
+    public void addCstr(String str) {
         this.getStack().get(0).setVal(str);
     }
 
