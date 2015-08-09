@@ -120,12 +120,12 @@ public class StrictparserInfo extends ParseInfo {
     }
 
     @Override
-    public Object hashKey(String key, int klen) {
+    public Object hashKey(String key) {
         return null;
     }
 
     @Override
-    public void hashSetCstr(Val parent, String str, int len, String orig) {
+    public void hashSetCstr(Val parent, String str) {
         ((Hashtable)this.getStack().peek().getVal()).put(parent.getKeyVal(), str);
     }
 
@@ -153,7 +153,7 @@ public class StrictparserInfo extends ParseInfo {
     }
 
     @Override
-    public void arrayAppendCstr(String str, int len, String orig) {
+    public void arrayAppendCstr(String str) {
         ((ArrayList)this.getStack().peek().getVal()).add(str);
     }
 

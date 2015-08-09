@@ -110,6 +110,10 @@ public abstract class ParseInfo {
         currentIndex++;
     }
 
+    public void decrementCurrentIndex(){
+        currentIndex--;
+    }
+
     public int getCurrentIndex(){
         return currentIndex;
     }
@@ -153,58 +157,57 @@ public abstract class ParseInfo {
                 readEscapedStr(str);
             }
         }
-//        if (0 == parent) { // simple add
-//            pi->add_cstr(pi, str, pi->cur - str, str);
-//        } else {
-//            switch (parent->next) {
-//                case NEXT_ARRAY_NEW:
-//                case NEXT_ARRAY_ELEMENT:
-//                    pi->array_append_cstr(pi, str, pi->cur - str, str);
-//                    parent->next = NEXT_ARRAY_COMMA;
-//                    break;
-//                case NEXT_HASH_NEW:
-//                case NEXT_HASH_KEY:
-//                    if (Qundef == (parent->key_val = pi->hash_key(pi, str, pi->cur - str))) {
-//                        parent->key = str;
-//                        parent->klen = pi->cur - str;
-//                    } else {
-//                        parent->key = "";
-//                        parent->klen = 0;
-//                    }
-//                    parent->k1 = *str;
-//                    parent->next = NEXT_HASH_COLON;
-//                    break;
-//                case NEXT_HASH_VALUE:
-//                    pi->hash_set_cstr(pi, parent, str, pi->cur - str, str);
-//                    if (0 != parent->key && 0 < parent->klen && (parent->key < pi->json || pi->cur < parent->key)) {
-//                        xfree((char*)parent->key);
-//                        parent->key = 0;
-//                    }
-//                    parent->next = NEXT_HASH_COMMA;
-//                    break;
-//                case NEXT_HASH_COMMA:
-//                case NEXT_NONE:
-//                case NEXT_ARRAY_COMMA:
-//                case NEXT_HASH_COLON:
-//                default:
-//                    oj_set_error_at(pi, oj_parse_error_class, __FILE__, __LINE__, "expected %s, not a string", oj_stack_next_string(parent->next));
-//                    break;
-//            }
-//        }
-//        pi->cur++;
+        if (parent==null) { // simple add
+            addCstr(cur.substring(str));
+        }
+        else {
+            switch (parent.getNext()) {
+                case OjConstants.NEXT_ARRAY_NEW:
+                case OjConstants.NEXT_ARRAY_ELEMENT:
+                    arrayAppendCstr(cur.substring(str));
+                    parent.setNext(OjConstants.NEXT_ARRAY_COMMA);
+                    break;
+                case OjConstants.NEXT_HASH_NEW:
+                case OjConstants.NEXT_HASH_KEY:
+                    parent.setKeyVal(hashKey(cur.substring(str)));
+                    if (parent.getKeyVal()==null){
+                        parent.setKey(cur.substring(str));
+                    }
+                    else {
+                        parent.setKey("");
+                    }
+                    parent.setKl(cur.charAt(str));
+                    parent.setNext(OjConstants.NEXT_HASH_COLON);
+                    break;
+                case OjConstants.NEXT_HASH_VALUE:
+                    hashSetCstr(parent,cur.substring(str));
+                    if(parent.getKey() == null && parent.getKey().length() >0 && (parent.getKey().length()< json
+                            .length() || cur.length() - currentIndex < parent.getKey().length())){
+
+                        parent.setKey("");
+                    }
+                    parent.setNext(OjConstants.NEXT_HASH_COMMA);
+                    break;
+                case OjConstants.NEXT_HASH_COMMA:
+                case OjConstants.NEXT_NONE:
+                case OjConstants.NEXT_ARRAY_COMMA:
+                case OjConstants.NEXT_HASH_COLON:
+                default:
+                    throw new Exception("expected " + parent.staclNextString() + ", not a string");
+            }
+        }
+        currentIndex++;
     }
 
-    public void readEscapedStr(int str) throws Exception {
+    public void readEscapedStr(int start) throws Exception {
 
         StringBuffer buf = new StringBuffer();
 
         int code;
         Val parent = this.getStack().peek();
-        int cnt = currentIndex - str;
-//
-//        buf_init(&buf);
+        int cnt = currentIndex - start;
         if (0 < cnt) {
-            buf.append(cur, str, currentIndex);
+            buf.append(cur, start, currentIndex);
         }
         for (char s = cur.charAt(currentIndex); s != '"'; s = cur.charAt(++currentIndex)) {
             if (currentIndex > cur.length()) {
@@ -243,7 +246,6 @@ public abstract class ParseInfo {
                             int c1 = (code - 0x0000D800) & 0x000003FF;
                             int c2;
                             if ('\\' != cur.charAt(currentIndex) || 'u' != cur.charAt(currentIndex + 1)) {
-//                            pi->cur = s;
                                 throw new Exception("invalid escaped character");
                             }
                             currentIndex += 2;
@@ -252,10 +254,6 @@ public abstract class ParseInfo {
                             code = ((c1 << 10) | c2) + 0x00010000;
                         }
                         buf = unicodeToChars(buf, code);
-//                    if (err_has(&pi->err)) {
-//                        buf_cleanup(&buf);
-//                        return;
-//                    }
                         break;
                     default:
                         throw new Exception("invalid escaped character");
@@ -270,54 +268,50 @@ public abstract class ParseInfo {
             switch (parent.getNext()) {
                 case OjConstants.NEXT_ARRAY_NEW:
                 case OjConstants.NEXT_ARRAY_ELEMENT:
-//                    pi->array_append_cstr(pi, buf.head, buf_len(&buf), start);
-//                    parent->next = NEXT_ARRAY_COMMA;
-//                    break;
-//                case NEXT_HASH_NEW:
-//                case NEXT_HASH_KEY:
-//                    if (Qundef == (parent->key_val = pi->hash_key(pi, buf.head, buf_len(&buf)))) {
-//                    parent->key = strdup(buf.head);
-//                    parent->klen = buf_len(&buf);
-//                } else {
-//                    parent->key = "";
-//                    parent->klen = 0;
-//                }
-//                parent->k1 = *start;
-//                parent->next = NEXT_HASH_COLON;
-//                break;
-//                case NEXT_HASH_VALUE:
-//                    pi->hash_set_cstr(pi, parent, buf.head, buf_len(&buf), start);
-//                    if (0 != parent->key && 0 < parent->klen && (parent->key < pi->json || pi->cur < parent->key)) {
-//                        xfree((char*)parent->key);
-//                        parent->key = 0;
-//                    }
-//                    parent->next = NEXT_HASH_COMMA;
-//                    break;
-//                case NEXT_HASH_COMMA:
-//                case NEXT_NONE:
-//                case NEXT_ARRAY_COMMA:
-//                case NEXT_HASH_COLON:
-//                default:
-//                    oj_set_error_at(pi, oj_parse_error_class, __FILE__, __LINE__, "expected %s, not a string", oj_stack_next_string(parent->next));
-//                    break;
-//            }
-        }
-//        pi->cur = s + 1;
-//        buf_cleanup(&buf);
+                    this.arrayAppendCstr(buf.toString());
+                    parent.setNext(OjConstants.NEXT_ARRAY_COMMA);
+                    break;
+                case OjConstants.NEXT_HASH_NEW:
+                case OjConstants.NEXT_HASH_KEY:
+                    parent.setKeyVal(this.hashKey(buf.toString()));
+                    if (parent.getKeyVal() == null) {
+                        parent.setKey(buf.toString());
+                    } else {
+                        parent.setKey("");
+                    }
+                    parent.setKl(getCur().charAt(start));
+                    parent.setNext(OjConstants.NEXT_HASH_COLON);
+                    break;
+                case OjConstants.NEXT_HASH_VALUE:
+                    this.hashSetCstr(parent, buf.toString());
+                    if (parent.getKey() != null && parent.getKey().length() > 0 && (parent.getKey().length() < json
+                            .length() || cur.length() - currentIndex < parent.getKey().length())) {
 
+                        parent.setKey("");
+                    }
+                    parent.setNext(OjConstants.NEXT_HASH_COMMA);
+                    break;
+                case OjConstants.NEXT_HASH_COMMA:
+                case OjConstants.NEXT_NONE:
+                case OjConstants.NEXT_ARRAY_COMMA:
+                case OjConstants.NEXT_HASH_COLON:
+                default:
+                    throw new Exception("expected " + parent.staclNextString() + ", not a string");
+            }
+            incrementCurrentIndex();
         }
     }
 
-    public int readHex() throws Exception{
+    public int readHex() throws Exception {
 
-        int	b = 0;
-        int	i;
+        int b = 0;
+        int i;
 
         for (i = 0; i < 4; i++, currentIndex++) {
             b = b << 4;
             char current = getCurrentChar();
-            if (current == '0' || current == '1' ||current == '2' ||current == '3' ||current == '4' ||current == '5'
-                    ||current == '6' ||current == '7' ||current == '8' ||current == '9') {
+            if (current == '0' || current == '1' || current == '2' || current == '3' || current == '4' || current == '5'
+                    || current == '6' || current == '7' || current == '8' || current == '9') {
                 b += Integer.parseInt(current + "");
             } else if (current == 'A' || current == 'a') {
                 b += 10;
@@ -331,7 +325,7 @@ public abstract class ParseInfo {
                 b += 14;
             } else if (current == 'F' || current == 'f') {
                 b += 15;
-            }  else {
+            } else {
                 throw new Exception("invalid hex character");
             }
         }
@@ -373,13 +367,144 @@ public abstract class ParseInfo {
         return buffer;
     }
 
+    public void readNum(){
+
+
+//        struct _NumInfo	ni;
+//        Val			parent = stack_peek(&pi->stack);
+//        int			zero_cnt = 0;
+//
+//        ni.str = pi->cur;
+//        ni.i = 0;
+//        ni.num = 0;
+//        ni.div = 1;
+//        ni.len = 0;
+//        ni.exp = 0;
+//        ni.dec_cnt = 0;
+//        ni.big = 0;
+//        ni.infinity = 0;
+//        ni.nan = 0;
+//        ni.neg = 0;
+//        ni.hasExp = 0;
+//        ni.no_big = (FloatDec == pi->options.bigdec_load);
+//
+//        if ('-' == *pi->cur) {
+//            pi->cur++;
+//            ni.neg = 1;
+//        } else if ('+' == *pi->cur) {
+//            pi->cur++;
+//        }
+//        if ('I' == *pi->cur) {
+//            if (0 != strncmp("Infinity", pi->cur, 8)) {
+//                oj_set_error_at(pi, oj_parse_error_class, __FILE__, __LINE__, "not a number or other value");
+//                return;
+//            }
+//            pi->cur += 8;
+//            ni.infinity = 1;
+//        } else if ('N' == *pi->cur || 'n' == *pi->cur) {
+//            if ('a' != pi->cur[1] || ('N' != pi->cur[2] && 'n' != pi->cur[2])) {
+//                oj_set_error_at(pi, oj_parse_error_class, __FILE__, __LINE__, "not a number or other value");
+//                return;
+//            }
+//            pi->cur += 3;
+//            ni.nan = 1;
+//        } else {
+//            for (; '0' <= *pi->cur && *pi->cur <= '9'; pi->cur++) {
+//                ni.dec_cnt++;
+//                if (ni.big) {
+//                    ni.big++;
+//                } else {
+//                    int	d = (*pi->cur - '0');
+//
+//                    if (0 == d) {
+//                        zero_cnt++;
+//                    } else {
+//                        zero_cnt = 0;
+//                    }
+//                    // TBD move size check here
+//                    ni.i = ni.i * 10 + d;
+//                    if (LONG_MAX <= ni.i || DEC_MAX < ni.dec_cnt - zero_cnt) {
+//                        ni.big = 1;
+//                    }
+//                }
+//            }
+//            if ('.' == *pi->cur) {
+//                pi->cur++;
+//                for (; '0' <= *pi->cur && *pi->cur <= '9'; pi->cur++) {
+//                    int	d = (*pi->cur - '0');
+//
+//                    if (0 == d) {
+//                        zero_cnt++;
+//                    } else {
+//                        zero_cnt = 0;
+//                    }
+//                    ni.dec_cnt++;
+//                    // TBD move size check here
+//                    ni.num = ni.num * 10 + d;
+//                    ni.div *= 10;
+//                    if (LONG_MAX <= ni.div || DEC_MAX < ni.dec_cnt - zero_cnt) {
+//                        ni.big = 1;
+//                    }
+//                }
+//            }
+//            if ('e' == *pi->cur || 'E' == *pi->cur) {
+//                int	eneg = 0;
+//
+//                ni.hasExp = 1;
+//                pi->cur++;
+//                if ('-' == *pi->cur) {
+//                    pi->cur++;
+//                    eneg = 1;
+//                } else if ('+' == *pi->cur) {
+//                    pi->cur++;
+//                }
+//                for (; '0' <= *pi->cur && *pi->cur <= '9'; pi->cur++) {
+//                    ni.exp = ni.exp * 10 + (*pi->cur - '0');
+//                    if (EXP_MAX <= ni.exp) {
+//                        ni.big = 1;
+//                    }
+//                }
+//                if (eneg) {
+//                    ni.exp = -ni.exp;
+//                }
+//            }
+//            ni.dec_cnt -= zero_cnt;
+//            ni.len = pi->cur - ni.str;
+//        }
+//        if (BigDec == pi->options.bigdec_load) {
+//            ni.big = 1;
+//        }
+//        if (0 == parent) {
+//            pi->add_num(pi, &ni);
+//        } else {
+//            switch (parent->next) {
+//                case NEXT_ARRAY_NEW:
+//                case NEXT_ARRAY_ELEMENT:
+//                    pi->array_append_num(pi, &ni);
+//                    parent->next = NEXT_ARRAY_COMMA;
+//                    break;
+//                case NEXT_HASH_VALUE:
+//                    pi->hash_set_num(pi, parent, &ni);
+//                    if (0 != parent->key && 0 < parent->klen && (parent->key < pi->json || pi->cur < parent->key)) {
+//                        xfree((char*)parent->key);
+//                        parent->key = 0;
+//                    }
+//                    parent->next = NEXT_HASH_COMMA;
+//                    break;
+//                default:
+//                    oj_set_error_at(pi, oj_parse_error_class, __FILE__, __LINE__, "expected %s", oj_stack_next_string(parent->next));
+//                    break;
+//            }
+//        }
+    }
+
     abstract public Object startHash();
 
     abstract public void endHash();
 
-    abstract public Object hashKey(String key, int klen);
+    abstract public Object hashKey(String key);
 
-    abstract public void hashSetCstr(Val kval, String str, int len, String orig);
+    abstract public void hashSetCstr(Val kval, String str);
 
     abstract public void hashSetNum(Val kval, NumInfo ni);
 
@@ -389,7 +514,7 @@ public abstract class ParseInfo {
 
     abstract public void endArray();
 
-    abstract public void arrayAppendCstr(String str, int len, String orig);
+    abstract public void arrayAppendCstr(String str);
 
     abstract public void arrayAppendNum(NumInfo ni);
 

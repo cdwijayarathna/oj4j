@@ -1,5 +1,7 @@
 package org.jruby.ext.beans;
 
+import org.jruby.ext.constants.OjConstants;
+
 import java.util.Hashtable;
 
 /**
@@ -13,6 +15,7 @@ public class Val {
     private Object keyVal;
     private String className;
     private char next;
+    private char kl;
 
 
     public Object getVal() {
@@ -61,5 +64,29 @@ public class Val {
 
     public void setNext(char next) {
         this.next = next;
+    }
+
+    public char getKl() {
+        return kl;
+    }
+
+    public void setKl(char kl) {
+        this.kl = kl;
+    }
+
+    public String staclNextString() {
+        switch (next) {
+            case OjConstants.NEXT_ARRAY_NEW:	return "array element or close";
+            case OjConstants.NEXT_ARRAY_ELEMENT:	return "array element";
+            case OjConstants.NEXT_ARRAY_COMMA:	return "comma";
+            case OjConstants.NEXT_HASH_NEW:		return "hash pair or close";
+            case OjConstants.NEXT_HASH_KEY:		return "hash key";
+            case OjConstants.NEXT_HASH_COLON:	return "colon";
+            case OjConstants.NEXT_HASH_VALUE:	return "hash value";
+            case OjConstants.NEXT_HASH_COMMA:	return "comma";
+            case OjConstants.NEXT_NONE:		break;
+            default:			break;
+        }
+        return "nothing";
     }
 }
