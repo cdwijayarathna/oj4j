@@ -130,9 +130,9 @@ public class StrictparserInfo extends ParseInfo {
     }
 
     @Override
-    public void hashSetNum(Val parent, NumInfo ni) {
+    public void hashSetNum(Val parent, Double num) {
 
-        ((Hashtable)this.getStack().peek().getVal()).put(parent.getKeyVal(), ni.getNum());
+        ((Hashtable)this.getStack().peek().getVal()).put(parent.getKeyVal(), num);
     }
 
     @Override
@@ -158,8 +158,8 @@ public class StrictparserInfo extends ParseInfo {
     }
 
     @Override
-    public void arrayAppendNum(NumInfo ni) {
-        ((ArrayList)this.getStack().peek().getVal()).add(ni.getNum());
+    public void arrayAppendNum(Double num) {
+        ((ArrayList)this.getStack().peek().getVal()).add(num);
     }
 
     @Override
@@ -173,8 +173,8 @@ public class StrictparserInfo extends ParseInfo {
     }
 
     @Override
-    public void addNum(NumInfo ni) {
-        this.getStack().get(0).setVal(ni.getNum());
+    public void addNum(Double number) {
+        this.getStack().get(0).setVal(number);
     }
 
     @Override

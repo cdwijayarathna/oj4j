@@ -1,5 +1,6 @@
 package org.jruby.ext.beans;
 
+import org.jruby.ext.Oj;
 import org.jruby.ext.constants.OjConstants;
 
 import java.util.ArrayList;
@@ -367,135 +368,162 @@ public abstract class ParseInfo {
         return buffer;
     }
 
-    public void readNum(){
+    public void readNum() throws Exception{
+
+        Val parent = this.getStack().peek();
+        double multiplier = 1;
+        Double number;
+        if (getCurrentChar() == '-') {
+            multiplier = -1;
+            incrementCurrentIndex();
+        } else if(getCurrentChar() == '+') {
+            incrementCurrentIndex();
+        }
+
+        if(getCurrentChar() == 'I') {
+            if( cur.substring(currentIndex, currentIndex + 8).equals("Infinity")){
+                number = Double.POSITIVE_INFINITY;
+            } else {
+                throw new Exception("not a number or other value");
+            }
+            currentIndex +=8;
+        } else if (getCurrentChar() == 'N' || getCurrentChar() == 'n') {
+            if (cur.charAt(currentIndex + 1) == 'a' && (cur.charAt(currentIndex + 2) == 'N' || cur.charAt
+                    (currentIndex + 2) == 'n')) {
+                number = Double.NaN;
+                currentIndex +=3;
+            } else {
+                throw new Exception("not a number or other value");
+            }
+        } else {
+            String numberStr = "";
+            while (getCurrentChar() == '0' || getCurrentChar() == '1' || getCurrentChar() == '2' || getCurrentChar() ==
+                    '3' || getCurrentChar() == '4'
+                    || getCurrentChar() == '5' || getCurrentChar() == '6' || getCurrentChar() == '7' || getCurrentChar() ==
+
+                    '0' || getCurrentChar() == '8' || getCurrentChar() == '9' || getCurrentChar() == '.') {
+
+                numberStr = numberStr + getCurrentChar();
+                currentIndex++;
+
+            }
+            number = Double.parseDouble(numberStr);
+            if (getCurrentChar() == 'e') {
+                int eMultiplier = 1;
+                incrementCurrentIndex();
+                if (getCurrentChar() == '-') {
+                    eMultiplier = -1;
+                    incrementCurrentIndex();
+                } else if(getCurrentChar() == '+') {
+                    incrementCurrentIndex();
+                }
+                String exponentStr = "";
+                while (getCurrentChar() == '0' || getCurrentChar() == '1' || getCurrentChar() == '2' || getCurrentChar() ==
+                        '3' || getCurrentChar() == '4'
+                        || getCurrentChar() == '5' || getCurrentChar() == '6' || getCurrentChar() == '7' || getCurrentChar() ==
+
+                        '0' || getCurrentChar() == '8' || getCurrentChar() == '9' || getCurrentChar() == '.') {
+
+                    exponentStr = exponentStr + getCurrentChar();
+                    currentIndex++;
+
+                }
+
+                Double exponent = Double.parseDouble(exponentStr);
+                exponent = exponent * eMultiplier;
+                number = Math.pow(number, exponent);
+
+            }
+        }
 
 
-//        struct _NumInfo	ni;
-//        Val			parent = stack_peek(&pi->stack);
-//        int			zero_cnt = 0;
-//
-//        ni.str = pi->cur;
-//        ni.i = 0;
-//        ni.num = 0;
-//        ni.div = 1;
-//        ni.len = 0;
-//        ni.exp = 0;
-//        ni.dec_cnt = 0;
-//        ni.big = 0;
-//        ni.infinity = 0;
-//        ni.nan = 0;
-//        ni.neg = 0;
-//        ni.hasExp = 0;
-//        ni.no_big = (FloatDec == pi->options.bigdec_load);
-//
-//        if ('-' == *pi->cur) {
-//            pi->cur++;
-//            ni.neg = 1;
-//        } else if ('+' == *pi->cur) {
-//            pi->cur++;
-//        }
-//        if ('I' == *pi->cur) {
-//            if (0 != strncmp("Infinity", pi->cur, 8)) {
-//                oj_set_error_at(pi, oj_parse_error_class, __FILE__, __LINE__, "not a number or other value");
-//                return;
-//            }
-//            pi->cur += 8;
-//            ni.infinity = 1;
-//        } else if ('N' == *pi->cur || 'n' == *pi->cur) {
-//            if ('a' != pi->cur[1] || ('N' != pi->cur[2] && 'n' != pi->cur[2])) {
-//                oj_set_error_at(pi, oj_parse_error_class, __FILE__, __LINE__, "not a number or other value");
-//                return;
-//            }
-//            pi->cur += 3;
-//            ni.nan = 1;
-//        } else {
-//            for (; '0' <= *pi->cur && *pi->cur <= '9'; pi->cur++) {
-//                ni.dec_cnt++;
-//                if (ni.big) {
-//                    ni.big++;
-//                } else {
-//                    int	d = (*pi->cur - '0');
-//
-//                    if (0 == d) {
-//                        zero_cnt++;
-//                    } else {
-//                        zero_cnt = 0;
-//                    }
-//                    // TBD move size check here
-//                    ni.i = ni.i * 10 + d;
-//                    if (LONG_MAX <= ni.i || DEC_MAX < ni.dec_cnt - zero_cnt) {
-//                        ni.big = 1;
-//                    }
-//                }
-//            }
-//            if ('.' == *pi->cur) {
-//                pi->cur++;
-//                for (; '0' <= *pi->cur && *pi->cur <= '9'; pi->cur++) {
-//                    int	d = (*pi->cur - '0');
-//
-//                    if (0 == d) {
-//                        zero_cnt++;
-//                    } else {
-//                        zero_cnt = 0;
-//                    }
-//                    ni.dec_cnt++;
-//                    // TBD move size check here
-//                    ni.num = ni.num * 10 + d;
-//                    ni.div *= 10;
-//                    if (LONG_MAX <= ni.div || DEC_MAX < ni.dec_cnt - zero_cnt) {
-//                        ni.big = 1;
-//                    }
-//                }
-//            }
-//            if ('e' == *pi->cur || 'E' == *pi->cur) {
-//                int	eneg = 0;
-//
-//                ni.hasExp = 1;
-//                pi->cur++;
-//                if ('-' == *pi->cur) {
-//                    pi->cur++;
-//                    eneg = 1;
-//                } else if ('+' == *pi->cur) {
-//                    pi->cur++;
-//                }
-//                for (; '0' <= *pi->cur && *pi->cur <= '9'; pi->cur++) {
-//                    ni.exp = ni.exp * 10 + (*pi->cur - '0');
-//                    if (EXP_MAX <= ni.exp) {
-//                        ni.big = 1;
-//                    }
-//                }
-//                if (eneg) {
-//                    ni.exp = -ni.exp;
-//                }
-//            }
-//            ni.dec_cnt -= zero_cnt;
-//            ni.len = pi->cur - ni.str;
-//        }
-//        if (BigDec == pi->options.bigdec_load) {
-//            ni.big = 1;
-//        }
-//        if (0 == parent) {
-//            pi->add_num(pi, &ni);
-//        } else {
-//            switch (parent->next) {
-//                case NEXT_ARRAY_NEW:
-//                case NEXT_ARRAY_ELEMENT:
-//                    pi->array_append_num(pi, &ni);
-//                    parent->next = NEXT_ARRAY_COMMA;
-//                    break;
-//                case NEXT_HASH_VALUE:
-//                    pi->hash_set_num(pi, parent, &ni);
-//                    if (0 != parent->key && 0 < parent->klen && (parent->key < pi->json || pi->cur < parent->key)) {
-//                        xfree((char*)parent->key);
-//                        parent->key = 0;
-//                    }
-//                    parent->next = NEXT_HASH_COMMA;
-//                    break;
-//                default:
-//                    oj_set_error_at(pi, oj_parse_error_class, __FILE__, __LINE__, "expected %s", oj_stack_next_string(parent->next));
-//                    break;
-//            }
-//        }
+        if (parent == null) {
+            addNum(number);
+        } else {
+            switch (parent.getNext()) {
+                case OjConstants.NEXT_ARRAY_NEW:
+                case OjConstants.NEXT_ARRAY_ELEMENT:
+                    arrayAppendNum(number);
+                    parent.setNext(OjConstants.NEXT_ARRAY_COMMA);
+                    break;
+                case OjConstants.NEXT_HASH_VALUE:
+                    hashSetNum(parent, number);
+                    if (parent.getKey() != null && parent.getKey().length() > 0 && (parent.getKey().length() < json
+                            .length() || cur.length() - currentIndex < parent.getKey().length())) {
+
+                        parent.setKey("");
+                    }
+                    parent.setNext(OjConstants.NEXT_HASH_COMMA);
+                    break;
+                default:
+                    throw new Exception("expected " + parent.staclNextString());
+
+            }
+        }
+    }
+
+    public void readTrue () throws Exception{
+
+        if (currentIndex == 'r' && cur.charAt(currentIndex + 1) == 'u' && cur.charAt(currentIndex + 2) == 'e') {
+            currentIndex += 3;
+            parseAddValue(Boolean.TRUE);
+        } else {
+            throw new Exception("Expected true");
+        }
+    }
+
+    public void readFalse () throws Exception{
+
+        if (currentIndex == 'a' && cur.charAt(currentIndex + 1) == 'l' && cur.charAt(currentIndex + 2) == 's' && cur
+                .charAt(currentIndex + 3) == 'e') {
+            currentIndex += 4;
+            parseAddValue(Boolean.FALSE);
+        } else {
+            throw new Exception("Expected false");
+        }
+    }
+
+    public void readNull () throws Exception{
+
+        if (currentIndex == 'u' && cur.charAt(currentIndex + 1) == 'l' && cur.charAt(currentIndex + 2) == 'l') {
+            currentIndex += 3;
+            parseAddValue(null);
+        } else {
+            throw new Exception("Expected null");
+        }
+    }
+
+    public void parseAddValue (Object value) throws Exception{
+
+        Val parent = this.getStack().peek();
+        if (parent == null) {
+            addValue(value);
+        } else {
+            switch (parent.getNext()){
+                case OjConstants.NEXT_ARRAY_NEW:
+                case OjConstants.NEXT_ARRAY_ELEMENT:
+                    arrayAppendValue(value);
+                    parent.setNext(OjConstants.NEXT_ARRAY_COMMA);
+                    break;
+                case OjConstants.NEXT_HASH_VALUE:
+                    hashSetvalue(parent, value);
+                    if (parent.getKey() != null && parent.getKey().length() > 0 && (parent.getKey().length() < json
+                            .length() || cur.length() - currentIndex < parent.getKey().length())) {
+
+                        parent.setKey("");
+                    }
+                    parent.setNext(OjConstants.NEXT_HASH_COMMA);
+                    break;
+                case OjConstants.NEXT_HASH_NEW:
+                case OjConstants.NEXT_HASH_KEY:
+                case OjConstants.NEXT_HASH_COMMA:
+                case OjConstants.NEXT_NONE:
+                case OjConstants.NEXT_ARRAY_COMMA:
+                case OjConstants.NEXT_HASH_COLON:
+                default:
+                    throw new Exception("expected " + parent.staclNextString());
+            }
+        }
     }
 
     abstract public Object startHash();
@@ -506,7 +534,7 @@ public abstract class ParseInfo {
 
     abstract public void hashSetCstr(Val kval, String str);
 
-    abstract public void hashSetNum(Val kval, NumInfo ni);
+    abstract public void hashSetNum(Val kval, Double num);
 
     abstract public void hashSetvalue(Val kval, Object value);
 
@@ -516,13 +544,13 @@ public abstract class ParseInfo {
 
     abstract public void arrayAppendCstr(String str);
 
-    abstract public void arrayAppendNum(NumInfo ni);
+    abstract public void arrayAppendNum(Double num);
 
     abstract public void arrayAppendValue(Object value);
 
     abstract public void addCstr(String str);
 
-    abstract public void addNum(NumInfo ni);
+    abstract public void addNum(Double number);
 
     abstract public void addValue(Object value);
 

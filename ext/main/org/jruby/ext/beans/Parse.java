@@ -17,24 +17,31 @@ public class Parse {
             nextNonWhite(pi);
             switch (pi.getCurrentChar()){
                 case '{':
+                    pi.incrementCurrentIndex();
                     pi.startHash();
                     break;
                 case  '}':
+                    pi.incrementCurrentIndex();
                     pi.endHash();
                     break;
                 case ':':
+                    pi.incrementCurrentIndex();
                     pi.colon();
                     break;
                 case '[':
+                    pi.incrementCurrentIndex();
                     pi.startArray();
                     break;
                 case ']':
+                    pi.incrementCurrentIndex();
                     pi.endArray();
                     break;
                 case ',':
+                    pi.incrementCurrentIndex();
                     pi.comma();
                     break;
                 case '"':
+                    pi.incrementCurrentIndex();
                     pi.readStr();
                     break;
                 case '+':
@@ -51,16 +58,40 @@ public class Parse {
                 case '9':
                 case 'I':
                 case 'N':
-                    pi.decrementCurrentIndex();
                     pi.readNum();
                     break;
+                case 't':
+                    pi.incrementCurrentIndex();
+                    pi.readTrue();
+                    break;
+                case 'f':
+                    pi.incrementCurrentIndex();
+                    pi.readFalse();
+                    break;
+                case 'n':
+                    pi.incrementCurrentIndex();
+                    if (pi.getCurrentChar() == 'u') {
+                        pi.readNull();
+                    } else {
+                        pi.decrementCurrentIndex();
+                        pi.readNum();
+                    }
+                break;
+//                case '/':
+//                    skip_comment(pi);
+//                    break;
+//                case '\0':
+//                    pi->cur--;
+//                    return;
+//                default:
+//                    oj_set_error_at(pi, oj_parse_error_class, __FILE__, __LINE__, "unexpected character");
+//                    return;
 
 
 
 
 
             }
-            pi.incrementCurrentIndex();
         }
 
     }
