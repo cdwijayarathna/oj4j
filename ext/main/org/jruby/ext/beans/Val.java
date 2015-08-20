@@ -18,6 +18,10 @@ public class Val {
     private char kl;
 
 
+    public Val (Object val) {
+        this.val = val;
+    }
+
     public Object getVal() {
         return val;
     }

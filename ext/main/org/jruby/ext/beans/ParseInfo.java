@@ -4,6 +4,7 @@ import org.jruby.ext.Oj;
 import org.jruby.ext.constants.OjConstants;
 
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 public abstract class ParseInfo {
@@ -147,7 +148,10 @@ public abstract class ParseInfo {
 
     public void readStr() throws Exception{
         int	str = getCurrentIndex();
-        Val		parent = this.getStack().peek();
+        Val	parent = null;
+        if (!stack.empty()) {
+            parent = this.getStack().peek();
+        }
 
         for (; '"' != getCurrentChar(); incrementCurrentIndex()) {
             if (currentIndex > cur.length()) {
@@ -162,6 +166,7 @@ public abstract class ParseInfo {
             addCstr(cur.substring(str));
         }
         else {
+            System.out.println("readStr,paren.getNext  " + parent.getNext() );
             switch (parent.getNext()) {
                 case OjConstants.NEXT_ARRAY_NEW:
                 case OjConstants.NEXT_ARRAY_ELEMENT:
@@ -523,6 +528,35 @@ public abstract class ParseInfo {
                 default:
                     throw new Exception("expected " + parent.staclNextString());
             }
+        }
+    }
+
+    public void skipComment () throws Exception{
+
+        if(getCurrentChar() == '*') {
+            incrementCurrentIndex();
+            for (;currentIndex < cur.length();incrementCurrentIndex()) {
+                if (cur.charAt(currentIndex) == '*' && cur.charAt(currentIndex + 1) == '/'){
+                    currentIndex +=2;
+                    return;
+                } else if (cur.length() <= currentIndex) {
+                    throw new Exception("comment not terminated");
+                }
+            }
+        } else if (getCurrentChar() == '/') {
+            for (;true;incrementCurrentIndex()) {
+                switch (getCurrentChar()) {
+                    case '\n':
+                    case '\r':
+                    case '\f':
+                    case '\0':
+                        return;
+                    default:
+                        break;
+                }
+            }
+        } else {
+            throw new Exception("invalid comment format");
         }
     }
 

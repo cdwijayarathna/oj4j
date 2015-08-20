@@ -364,7 +364,7 @@ public class Oj {
     }
 
     @JRubyMethod(module = true, required = 1, optional = 1)
-    public static IRubyObject load(ThreadContext context, IRubyObject self, IRubyObject[] args) {
+    public static IRubyObject load(ThreadContext context, IRubyObject self, IRubyObject[] args) throws Exception {
 
         char mode = OjLibrary.parser.getMode();
 
@@ -457,12 +457,12 @@ public class Oj {
     }
 
     @JRubyMethod(module = true, required = 1, optional = 1)
-    public static IRubyObject strict_load(ThreadContext context, IRubyObject self, IRubyObject[] args) {
+    public static IRubyObject strict_load(ThreadContext context, IRubyObject self, IRubyObject[] args) throws Exception{
 
         ParseInfo pi = new StrictparserInfo();
         pi.setOptions(new Options());
-        ojParsePi(context, args, pi, null, 1);
-        return null;
+        IRubyObject json = (IRubyObject) ojParsePi(context, args, pi, null, 1);
+        return json;
     }
 
     @JRubyMethod(module = true, required = 2, optional = 1)
@@ -485,9 +485,10 @@ public class Oj {
         return null;
     }
 
-    private static Object ojParsePi(ThreadContext context, IRubyObject[] args, ParseInfo pi, String json, int yield0k) {
+    private static Object ojParsePi(ThreadContext context, IRubyObject[] args, ParseInfo pi, String json, int
+            yield0k) throws Exception{
 
-
+        Object result;
         Object wrappedStack;
         if (args.length < 1) {
             throw context.runtime.newArgumentError("Wrong number of arguments to load().");
@@ -507,20 +508,70 @@ public class Oj {
         } else {
             //if()
         }
-
         if (pi.getOptions().getCircular() == 'y') {
             pi.setCircArray(new CircArray());
         }
         if (pi.getOptions().getAllow_gc() == 'y') {
 
         }
-        wrappedStack = pi.getStack();
-        Val v = pi.getStack().peek();
-        if (v != null) {
+//        wrappedStack = pi.getStack();
+//        rb_protect(protect_parse, (VALUE)pi, &line);
+        Parse.ojParse2(pi);
+        result = pi.getStack().peek();
+//        DATA_PTR(wrapped_stack) = 0;
+//        if (No == pi->options.allow_gc) {
+//            rb_gc_enable();
+//        }
+//        if (!err_has(&pi->err)) {
+//            // If the stack is not empty then the JSON terminated early.
+//            Val	v;
+//
+//            if (0 != (v = stack_peek(&pi->stack))) {
+//                switch (v->next) {
+//                    case NEXT_ARRAY_NEW:
+//                    case NEXT_ARRAY_ELEMENT:
+//                    case NEXT_ARRAY_COMMA:
+//                        oj_set_error_at(pi, oj_parse_error_class, __FILE__, __LINE__, "Array not terminated");
+//                        break;
+//                    case NEXT_HASH_NEW:
+//                    case NEXT_HASH_KEY:
+//                    case NEXT_HASH_COLON:
+//                    case NEXT_HASH_VALUE:
+//                    case NEXT_HASH_COMMA:
+//                        oj_set_error_at(pi, oj_parse_error_class, __FILE__, __LINE__, "Hash/Object not terminated");
+//                        break;
+//                    default:
+//                        oj_set_error_at(pi, oj_parse_error_class, __FILE__, __LINE__, "not terminated");
+//                }
+//            }
+//        }
 
-        }
 
-        return null;
+            pi.setCircArray(null);
+            pi.getStack().removeAllElements();
+//        if (0 != line) {
+//            rb_jump_tag(line);
+//        }
+//        if (err_has(&pi->err)) {
+//            oj_err_raise(&pi->err);
+//        }
+//        if (pi->options.quirks_mode == No) {
+//            switch (rb_type(result)) {
+//                case T_NIL:
+//                case T_TRUE:
+//                case T_FALSE:
+//                case T_FIXNUM:
+//                case T_FLOAT:
+//                case T_CLASS:
+//                case T_SYMBOL:
+//                    rb_raise(oj_parse_error_class, "unexpected non-document value");
+//                    break;
+//                default:
+//                    // okay
+//                    break;
+//            }
+//        }
+        return result;
     }
 
     private static void oj_pi_set_input_str(ParseInfo pi, Object input) {
